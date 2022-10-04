@@ -179,6 +179,9 @@ class_map = {"Abra" : 0 ,
 pok_map = {v: k for k, v in class_map.items()}
 
 path = "./test/img.jpg"
-image = cv2.imread(path, 0)
-pred = model(image)
+img = cv2.imread(path, 0)
+img = cv2.resize(img, (416, 416))
+img_tensor = torchvision.transforms.functional.to_tensor(img)
+img_tensor = img_tensor.permute(2, 0, 1)
+pred = model(img_tensor)
 print(pok_map[pred])
