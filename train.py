@@ -35,7 +35,7 @@ def train_loop(dataloader, model, loss_fn, optimizer):
 # Hyperparameters
 learning_rate = 1e-3
 batch_size = 64
-epochs = 20
+epochs = 5
 
 load = False
 
@@ -203,9 +203,10 @@ optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
 training_data = TrainingDataset()
 train_dataloader = DataLoader(training_data, batch_size=64, shuffle=True)
-
+# for x, (y, z) in enumerate(train_dataloader):
+#     print(y.size())
 for t in range(epochs):
     print(f"Epoch {t+1}\n-------------------------------")
     train_loop(train_dataloader, model, loss_fn, optimizer)
 
-torch.save(model.state_dict(), "output/output2.pth")
+torch.save(model.state_dict(), "output/output1.pth")

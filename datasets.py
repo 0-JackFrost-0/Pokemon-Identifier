@@ -197,8 +197,8 @@ class TrainingDataset(Dataset):
 
 if __name__ == "__main__":
     a = TrainingDataset()
-    b,c = a.__getitem__(1)
+    b,c = a.__getitem__(3403)
     b = b.permute(1,2,0)
-    print(b.size())
-    cv2.imshow("Img", b.numpy())
+    # print(b.numpy()[0][0][0])
+    cv2.imshow("Img", b.numpy()[0])
     cv2.waitKey(10000)

@@ -22,7 +22,7 @@ load = True
 model = NeuralNetwork1().to(device)
 
 if load:
-    model.load_state_dict(torch.load("output/output.pth"))
+    model.load_state_dict(torch.load("output/output1.pth"))
     model.eval()
 
 class_map = {"Abra" : 0 ,
@@ -178,10 +178,23 @@ class_map = {"Abra" : 0 ,
                         }
 pok_map = {v: k for k, v in class_map.items()}
 
-path = "./test/img.jpg"
+path = "./test/img4.jpg"
 img = cv2.imread(path, 0)
 img = cv2.resize(img, (416, 416))
 img_tensor = torchvision.transforms.functional.to_tensor(img)
 img_tensor = img_tensor.permute(2, 0, 1)
+img_tensor = img_tensor.unsqueeze(0)
+# print(img_tensor.size())
 pred = model(img_tensor)
-print(pok_map[pred])
+pred = torch.argmax(pred)
+# i = 0
+# maxi = -
+# found = False
+# for num in pred.detach().numpy()[0]:
+#     # print(num)
+#     if num > i:
+#         i = num
+#     i += 1
+# print(pred.item())
+# print(pred.detach().numpy()[0])
+print(pok_map[pred.item()])
