@@ -29,7 +29,9 @@ class NeuralNetwork1(nn.Module):
             nn.Linear(500, 4*7*7),
         )
         self.linear_layers = nn.Sequential(
-            nn.Linear(43264, 150)
+            nn.Linear(43264, 150),
+            # nn.Linear(43264, 1024),
+            # nn.Linear(1024, 150)
         )
         
 
@@ -49,41 +51,45 @@ class NeuralNetwork2(nn.Module):
         super().__init__()
         self.conv_layers = nn.Sequential(
             
-            nn.Conv2d(3, 32, kernel_size = 3, padding = 1),
-            nn.ReLU(),
+            nn.Conv2d(1, 32, kernel_size = 3, padding = 1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=2, stride=2),
             nn.Conv2d(32,64, kernel_size = 3, stride = 1, padding = 1),
-            nn.ReLU(),
-            nn.MaxPool2d(2,2),
+            nn.BatchNorm2d(64),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=2, stride=2),
         
-            nn.Conv2d(64, 128, kernel_size = 3, stride = 1, padding = 1),
-            nn.ReLU(),
-            nn.Conv2d(128 ,128, kernel_size = 3, stride = 1, padding = 1),
-            nn.ReLU(),
+            # nn.Conv2d(64, 128, kernel_size = 3, stride = 1, padding = 1),
+            # nn.ReLU(),
+            # nn.Conv2d(128 ,128, kernel_size = 3, stride = 1, padding = 1),
+            # nn.ReLU(),
             nn.MaxPool2d(2,2),
             
-            nn.Conv2d(128, 256, kernel_size = 3, stride = 1, padding = 1),
-            nn.ReLU(),
-            nn.Conv2d(256,256, kernel_size = 3, stride = 1, padding = 1),
-            nn.ReLU(),
+            # nn.Conv2d(128, 256, kernel_size = 3, stride = 1, padding = 1),
+            # nn.ReLU(),
+            # nn.Conv2d(256,256, kernel_size = 3, stride = 1, padding = 1),
+            # nn.ReLU(),
             nn.MaxPool2d(2,2)
         )
         self.lin_layers = nn.Sequential(
             
-            nn.Flatten(),
-            nn.Linear(82944,1024),
-            nn.ReLU(),
-            nn.Linear(1024, 512),
-            nn.ReLU(),
-            nn.Linear(512,6)
+            nn.Linear(43264,150),
+            # nn.ReLU(),
+            # nn.Linear(1024, 512),
+            # # nn.ReLU(),
+            # nn.Linear(512,150)
         )
     
     def forward(self, x):
+        x = x.permute(0,2,1,3)
         x = self.conv_layers(x)
+        x = x.view(x.size(0), -1)
         x = self.lin_layers(x)
         return x
 
 
 
 if __name__ == "__main__":
-    model = NeuralNetwork1()
+    model = NeuralNetwork2()
     print(model)
