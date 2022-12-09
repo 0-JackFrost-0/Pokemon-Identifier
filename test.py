@@ -7,7 +7,7 @@ import torchvision
 # from torchvision import datasets, transforms
 # from torchvision.transforms import ToTensor, Lambda
 from models import NeuralNetwork1, NeuralNetwork2
-from datasets import TrainingDataset
+from datasets import TestingDataset, TrainingDataset
 import numpy as np
 import argparse
 
@@ -22,7 +22,7 @@ load = True
 model = NeuralNetwork1().to(device)
 
 if load:
-    model.load_state_dict(torch.load("output/output1.pth"))
+    model.load_state_dict(torch.load("output/newral.pth"))
     model.eval()
 
 class_map = {"Abra" : 0 ,
@@ -178,23 +178,38 @@ class_map = {"Abra" : 0 ,
                         }
 pok_map = {v: k for k, v in class_map.items()}
 
-path = "./test/img4.jpg"
-img = cv2.imread(path, 0)
-img = cv2.resize(img, (416, 416))
-img_tensor = torchvision.transforms.functional.to_tensor(img)
-img_tensor = img_tensor.permute(2, 0, 1)
-img_tensor = img_tensor.unsqueeze(0)
-# print(img_tensor.size())
-pred = model(img_tensor)
-pred = torch.argmax(pred)
-# i = 0
-# maxi = -
-# found = False
-# for num in pred.detach().numpy()[0]:
-#     # print(num)
-#     if num > i:
-#         i = num
-#     i += 1
-# print(pred.item())
-# print(pred.detach().numpy()[0])
-print(pok_map[pred.item()])
+# path = "./test/abra.jpg"
+# img = cv2.imread(path, 0)
+# img = cv2.resize(img, (416, 416))
+# img_tensor = torchvision.transforms.functional.to_tensor(img)
+# img_tensor = img_tensor.permute(2, 0, 1)
+# img_tensor = img_tensor.unsqueeze(0)
+# # print(img_tensor.size())
+# pred = model(img_tensor)
+# pred = torch.argmax(pred)
+# # i = 0
+# # maxi = -
+# # found = False
+# # for num in pred.detach().numpy()[0]:
+# #     # print(num)
+# #     if num > i:
+# #         i = num
+# #     i += 1
+# # print(pred.item())
+# # print(pred.detach().numpy()[0])
+# print(pok_map[pred.item()])
+count = 0
+total = 0
+testing_data = TestingDataset()
+test_dataloader = DataLoader(testing_data, batch_size=1, shuffle=True)
+for batch, (x, y) in enumerate(test_dataloader):
+    if (x, y) != ([], []):
+        pred = model(x)
+        pred = torch.argmax(pred)
+        total += 1
+        # print(total)
+        if pred.item() == y:
+            # print("hi")
+            count += 1
+            print(total)
+print(f"Accuracy: {count*100/total}")
