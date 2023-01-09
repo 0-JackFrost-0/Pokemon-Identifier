@@ -1,11 +1,14 @@
-import cv2
 import os
+
+import cv2
 import numpy as np
 import torch
-from torch.utils.data import Dataset, DataLoader
 import torchvision
+from torch.utils.data import DataLoader, Dataset
+from torchvision.models import ResNet50_Weights, resnet50
 
-
+weights = ResNet50_Weights.DEFAULT
+preprocess = weights.transforms()
 class TrainingDataset(Dataset):
     def __init__(self):
         self.imgs_path = "PokemonData/"
@@ -190,9 +193,12 @@ class TrainingDataset(Dataset):
         # print(img.shape)
         class_id = self.class_map[class_name]
         # img_tensor = torch.from_numpy(img)
+
         img_tensor = torchvision.transforms.functional.to_tensor(img)
-        img_tensor = img_tensor.permute(2, 0, 1)
-        print(img_tensor.size())
+        # img_tensor = torchvision.transforms.functional.to_tensor(img_tensor)
+        img_tensor = preprocess(img_tensor)
+        # img_tensor = img_tensor.permute(2, 0, 1)
+        # print(img_tensor.size())
         class_id = torch.tensor(class_id)
         return img_tensor, class_id
 

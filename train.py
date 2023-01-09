@@ -1,18 +1,21 @@
+import argparse
 import os
+
+import cv2
+import numpy as np
 import torch
+import torchvision
 from torch import nn
 from torch.utils.data import DataLoader
-import cv2
-import torchvision
+from torchvision.models import ResNet50_Weights, resnet50
+
+from datasets import TrainingDataset
+
 # from torchvision import datasets, transforms
 # from torchvision.transforms import ToTensor, Lambda
-from models import NeuralNetwork1, NeuralNetwork2
-from datasets import TrainingDataset
-import numpy as np
-import argparse
-
-
-
+# from models import NeuralNetwork1, NeuralNetwork2
+weights = ResNet50_Weights.DEFAULT
+preprocess = weights.transforms()
 device = "cpu"
 
 def train_loop(dataloader, model, loss_fn, optimizer):
@@ -35,17 +38,28 @@ def train_loop(dataloader, model, loss_fn, optimizer):
 # Hyperparameters
 learning_rate = 1e-3
 batch_size = 64
-epochs = 5
+epochs = 20
 
 load = False
 
-model = NeuralNetwork1().to(device)
+# model = NeuralNetwork1().to(device)
+
+def poke_model():
+    model = resnet50(weights=ResNet50_Weights.IMAGENET1K_V1)
+    weights = ResNet50_Weights.DEFAULT
+    preprocess = weights.transforms()
+    for param in model.parameters():
+        param.requires_grad = False
+    model.fc = nn.Sequential( nn.Linear(2048, 512),nn.ReLU(),nn.Dropout(0.2),nn.Linear(512, 150),nn.LogSoftmax(dim=1))
+    return model
+
+model = poke_model().to(device)
 
 if load:
     model.load_state_dict(torch.load("output/output.pth"))
     model.eval()
 
-class_map = {"Abra" : 0 ,
+class_map = {               "Abra" : 0 ,
                             "Aerodactyl" : 1 ,
                             "Alakazam" : 2 ,
                             "Alolan Sandslash" : 3 ,
@@ -199,14 +213,17 @@ class_map = {"Abra" : 0 ,
 pok_map = {v: k for k, v in class_map.items()}
 
 loss_fn = nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate) 
+optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, weight_decay=1e-5) 
 
 training_data = TrainingDataset()
 train_dataloader = DataLoader(training_data, batch_size=64, shuffle=True)
-# for x, (y, z) in enumerate(train_dataloader):
-#     print(y.size())
+# print(enumerate(train_dataloader))
 for t in range(epochs):
     print(f"Epoch {t+1}\n-------------------------------")
     train_loop(train_dataloader, model, loss_fn, optimizer)
 
-torch.save(model.state_dict(), "output/output1.pth")
+torch.save(model.state_dict(), "output/newral.pth")
+
+
+# for batch, (x, y) in enumerate(train_dataloader):
+#     print(y)

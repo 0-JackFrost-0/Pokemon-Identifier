@@ -1,10 +1,13 @@
+import os
+
+import numpy as np
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
+
 # from torchvision import datasets, transforms
 # from torchvision.transforms import ToTensor, Lambda
-import os
-import numpy as np
+
 
 class NeuralNetwork1(nn.Module):
     def __init__(self):
@@ -45,6 +48,16 @@ class NeuralNetwork1(nn.Module):
         x = self.linear_layers(x)
         return x
 
+model = resnet50(weights="IMAGENET1K_V1")
+
+
+num_ftrs = model_ft.fc.in_features
+# Initialize the Weight Transforms
+weights = ResNet50_Weights.DEFAULT
+preprocess = weights.transforms()
+
+# Apply it to the input image
+img_transformed = preprocess(img)
 
 class NeuralNetwork2(nn.Module):
     def __init__(self):
